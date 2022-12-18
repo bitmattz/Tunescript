@@ -9,13 +9,19 @@ from scipy.io.wavfile import write
 
 
 # fluidsynth c:\users\matheus\appdata\local\pip\cache\wheels\dc\16\09\eb08b4e34e6b638f113d2018cf0b22de1d8dca22a3a71873f7
-fs = fluidsynth.Synth()
-fs.start(driver = 'dsound')  # use DirectSound driver
-sfid = fs.sfload(r'C:\Users\Matheus\Downloads\fluidsynth-2.3.0-win10-x64\FluidR3_GM\FluidR3_GM.sf2')  # replace path as needed
-#sfid = fs.sfload(r'C:\Users\Matheus\Downloads\fluidsynth-2.3.0-win10-x64\FluidR3_GM\Minecraft_GM.sf2')  # replace path as needed
-fs.program_select(0, sfid, 0, 0)
-fs.set_reverb(100,1,100,1)
-fs.set_chorus(99,1,99,1)
+piano = fluidsynth.Synth()
+piano.start(driver ='dsound')  # use DirectSound driver
+piano_som = piano.sfload(r'C:\Users\Matheus\Downloads\fluidsynth-2.3.0-win10-x64\FluidR3_GM\FluidR3_GM.sf2')  # replace path as needed
+piano.program_select(0, piano_som, 0, 0)
+piano.set_reverb(100, 1, 100, 1)
+piano.set_chorus(99, 1, 99, 1)
+
+violino = fluidsynth.Synth()
+violino.start(driver = 'dsound')  # use DirectSound driver
+violino_som = violino.sfload(r'C:\Users\Matheus\Downloads\fluidsynth-2.3.0-win10-x64\FluidR3_GM\336_Massive_strings.sf2')  # replace path as needed
+violino.program_select(0, piano_som, 0, 0)
+violino.set_reverb(100,1,100,1)
+violino.set_chorus(99,1,99,1)
 
 notas_oitavas ={
     1: {'C':0,'C#':1,'D':2,'D#':3,'E':4,'F':5,'F#':6,'G':7,'G#':8,'A':9,'A#':10,'B':11},
@@ -106,7 +112,7 @@ def getAcorde(oitava, acorde):
 
 def play(campo_hamornico, duracao):
     notas = campos_harmonicos.get(campo_hamornico)
-    tempo = 0.4
+    tempo = 1
 
     for step in range(duracao):
         n_acorde_aleatorio = random.randint(0, len(campos_harmonicos.get(campo_hamornico))) -1
@@ -117,43 +123,40 @@ def play(campo_hamornico, duracao):
         quinta = acorde.get('quinta')
         setima = acorde.get('setima')  if acorde.get('setima') != "" else ''
 
+        violino.noteon(0,nota_tonica,127)
 
-        fs.noteon(0, nota_tonica, 127)
-        fs.noteon(0, terca, 127)
-        fs.noteon(0, quinta, 127)
-        fs.noteon(0, setima, 127) if setima != "" else ''
+        piano.noteon(0, nota_tonica, 127)
+        piano.noteon(0, terca, 127)
+        piano.noteon(0, quinta, 127)
+        piano.noteon(0, setima, 127) if setima != "" else ''
 
         time.sleep(tempo)
 
-        fs.noteoff(0, nota_tonica)
-        fs.noteoff(0, terca)
-        fs.noteoff(0, quinta)
-        fs.noteoff(0, setima) if setima != "" else ''
+        piano.noteoff(0, nota_tonica)
+        piano.noteoff(0, terca)
+        piano.noteoff(0, quinta)
+        piano.noteoff(0, setima) if setima != "" else ''
 
 
 
         #time.sleep(0.1)
 
         n_acorde_aleatorio_reserva = random.randint(0, len(campos_harmonicos.get(campo_hamornico))) -1
-        acorde_reserva = getAcorde(random.randint(4,8), notas[n_acorde_aleatorio_reserva])
+        acorde_reserva = getAcorde(random.randint(3,5), notas[n_acorde_aleatorio_reserva])
         notas_acordes = [nota_tonica, terca, quinta, acorde_reserva.get('nota_tonica'), acorde_reserva.get('terca'),acorde_reserva.get('quinta')]
         for dedilhado in range(random.randint(2,20)):
 
             nota_aleatoria = notas_acordes[random.randint(0,5)]
 
 
-            fs.noteon(0, nota_aleatoria, 127)
-            time.sleep(0.2)
-            fs.noteoff(0, nota_aleatoria)
+            piano.noteon(0, nota_aleatoria, 127)
+            time.sleep(tempo/2)
+            piano.noteoff(0, nota_aleatoria)
+        violino.noteoff(0,nota_tonica)
 
 
-
-
-
-
-
-play('C',5)
-fs.delete()
+play('Bm',50000)
+piano.delete()
 
 
 
